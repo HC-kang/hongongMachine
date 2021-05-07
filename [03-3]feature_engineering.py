@@ -133,7 +133,3 @@ print(lasso.score(test_scaled, test_target))
 
 print(np.sum(lasso.coef_ ==0))
 
-lasso
-
-Ridge
-Lasso
