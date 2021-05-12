@@ -144,10 +144,12 @@ print(np.mean(scores['test_score']))
 from sklearn.model_selection import StratifiedKFold
 scores = cross_validate(dt, train_input, train_target, cv = StratifiedKFold())
 print(np.mean(scores['test_score']))
+        # 0.855300214703487
 
 splitter = StratifiedKFold(n_splits = 10, shuffle = True, random_state = 42)
 scores = cross_validate(dt, train_input, train_target, cv = splitter)
 print(np.mean(scores['test_score']))
+        # 0.8574181117533719
 ##################
 # # 2회차
 # import numpy as np
@@ -216,15 +218,18 @@ print(np.max(gs.cv_results_['mean_test_score']))
 ##################################
 
 from scipy.stats import uniform, randint
-
+        # scipy의 stats 서브 패키지에 있는 uniform과 randint는 모두 균등분포에서 샘플링한다고 함.
+        # randint : 정수, uniform : 실수
 rgen = randint(0, 10)
 rgen
 rgen.rvs(10)
+        # 1~10까지 정수 10개 생성
 
 np.unique(rgen.rvs(1000), return_counts = True)
 
 ugen = uniform(0, 1)
 ugen.rvs(10)
+        # 1~10까지 실수 10개 생성
 
 params = {
     'min_impurity_decrease' : uniform(0.0001, 0.001),
@@ -232,20 +237,31 @@ params = {
     'min_samples_leaf' : randint(2, 25),
     'min_samples_leaf' : randint(1, 25)
 }
+        # 이번에는 params를 수동으로 작성하지 않고 uniform 과 randint 함수를 통해 생성함.
+        # parameter 의 종류는 해당 함수의 공식문서를 확인하자.
+
 
 from sklearn.model_selection import RandomizedSearchCV
+        # 위의 그리드 서치와 비슷하게, 랜덤 서치 함수를 불러와준다.
 
 gs = RandomizedSearchCV(DecisionTreeClassifier(random_state = 42), params, n_iter = 100, n_jobs = -1, random_state = 42)
+        # n_iter 는 지정된 params 의 범위 내에서 랜덤하게 시행하는 횟수이고, 기본값은 10회. 여기서는 100회로 지정.
+        # 숫자가 클수록 성능은 잘 나올수 있겠지만, 소요시간에 늘어남.
 
 gs.fit(train_input, train_target)
 
 print(gs.best_params_)
+        #{'max_depth': 36, 말단 노드까지의 층 수
+        # 'min_impurity_decrease': 0.00041435598107632666,  - 최소 순수도 감소폭
+        # 'min_samples_leaf': 4} - 말단 노드에 있어야할 최소한의 샘플 수
 
 print(np.max(gs.cv_results_['mean_test_score']))
+        # 0.8697336566224921
 
 dt = gs.best_estimator_
 
 print(dt.score(test_input, test_target))
+        # 0.8592307692307692
 
 
 # 확인 문제s
