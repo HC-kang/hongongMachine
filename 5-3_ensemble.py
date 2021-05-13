@@ -9,7 +9,7 @@ wine = pd.read_csv('https://bit.ly/wine-date')
 
 data = wine[['alcohol', 'sugar', 'pH']].to_numpy()
 target = wine['class'].to_numpy()
-        # data는 행렬로 만들어주기 위해 
+        # 행렬로 만들어주기
 
 train_input, test_input, train_target, test_target = train_test_split(
     data, target, test_size = 0.2, random_state=42)
@@ -21,6 +21,10 @@ from sklearn.ensemble import RandomForestClassifier
 rf = RandomForestClassifier(n_jobs = -1, random_state = 42)
 scores = cross_validate(rf, train_input, train_target, return_train_score = True, n_jobs=-1)
 print(scores)
+        # {'fit_time': array([0.07155704, 1.87472916, 1.88724589, 1.87677908, 0.07141995]), 
+        #  'score_time': array([0.01026511, 0.00269818, 0.00247002, 0.00234699, 0.01156807]), 
+        #  'test_score': array([0.87307692, 0.87692308, 0.91049086, 0.86044273, 0.87969201]), 
+        #  'train_score': array([0.93841713, 0.93432764, 0.93410293, 0.93434343, 0.93795094])} 
         # return_train_score = True 로 인해 scores에 train_score가 포함되어 출력됨.
 
 print(np.mean(scores['train_score']), np.mean(scores['test_score']))
@@ -33,7 +37,7 @@ print(rf.feature_importances_)
 
 rf = RandomForestClassifier(oob_score = True, n_jobs = -1, random_state = 42)
         # oob_score : out of bag - 부트스트랩 샘플에 포함되지 않은 샘플.
-        # 일정의 검정세트로 작동 
+        # 일종의 검정세트로 작동 
 rf.fit(train_input, train_target)
 print(rf.oob_score_)
         # 0.8934000384837406
@@ -97,27 +101,40 @@ from sklearn.inspection import permutation_importance
 
 hgb.fit(train_input, train_target)
 result = permutation_importance(hgb, train_input, train_target, n_repeats=10, random_state = 42, n_jobs=-1)
-print(result.importances_mean)
-        # [0.08876275 0.23438522 0.08027708]
-        # n_repeat = None = 5 :  
 print(result.importances)
 print(result.importances_std)
-
-
+print(result.importances_mean)
+        # [0.08876275 0.23438522 0.08027708]
+        # n_repeat = None = 5 : 특성을 비교하기위해 섞을 횟수. 여기서는 10회 적용
 
 result = permutation_importance(hgb, test_input, test_target, n_repeats = 10, random_state = 42, n_jobs = -1)
+print(result.importances)
+print(result.importances_std)
 print(result.importances_mean)
         # [0.05969231 0.20238462 0.049     ]
 
 hgb.score(test_input, test_target)
         # 0.8723076923076923
-print(result.importances)
-print(result.importances_std)
 
 
 #####
 # XHBoost
 ###
 
+import xgboost
+
 from xgboost import XGBClassifier
 xgb = XGBClassifier(tree_method='hist', random_state = 42)
+scores = cross_validate(xgb, train_input, train_target, return_train_score = True, n_jobs = -1)
+print(np.mean(scores['train_score']), np.mean(scores['test_score']))
+        # 0.9555033709953124 0.8799326275264677
+
+
+#####
+# LightGBM
+### 
+from lightgbm import LGBMClassifier
+lgb = LGBMClassifier(random_state=42)
+scores = cross_validate(lgb, train_input, train_target, return_train_score=True, n_jobs=-1)
+print(np.mean(scores['train_score']), np.mean(scores['test_score']))
+        #0.935828414851749 0.8801251203079884
